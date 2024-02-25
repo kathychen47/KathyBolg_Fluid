@@ -1,0 +1,807 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/kathy_avatar.jpg">
+  <link rel="icon" href="/img/kathy_avatar.jpg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Kathy Chen">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Code In Python fbp.py  123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Filter Back Projection (FBP)">
+<meta property="og:url" content="http://example.com/2023/04/07/Computed_Tomography/Recon/Filter%20Back%20Projection%20(FBP)/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Code In Python fbp.py  123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-04-06T12:00:00.000Z">
+<meta property="article:modified_time" content="2023-07-08T06:22:58.000Z">
+<meta property="article:author" content="Kathy Chen">
+<meta property="article:tag" content="FBP">
+<meta property="article:tag" content="Filter Back Projection">
+<meta property="article:tag" content="CT">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>Filter Back Projection (FBP) - Hexo</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.1.1"><style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Kathy</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archives</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tags</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Filter Back Projection (FBP)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-04-07 00:00" pubdate>
+          April 7, 2023 am
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          541 words
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          5 mins
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Filter Back Projection (FBP)</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="Code-In-Python"><a href="#Code-In-Python" class="headerlink" title="Code In Python"></a>Code In Python</h2><ol>
+<li>fbp.py</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> pydicom<br><span class="hljs-keyword">from</span> PIL <span class="hljs-keyword">import</span> Image, ImageOps<br><span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt<br><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np<br><span class="hljs-keyword">from</span> scipy.fftpack <span class="hljs-keyword">import</span> fft, ifft, fftshift<br><span class="hljs-keyword">import</span> fbp<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">arange2</span>(<span class="hljs-params">start, stop=<span class="hljs-literal">None</span>, step=<span class="hljs-number">1</span></span>):<br>    <span class="hljs-string">"""#Modified version of numpy.arange which corrects error associated with non-integer step size"""</span><br>    <span class="hljs-keyword">if</span> stop == <span class="hljs-literal">None</span>:<br>        a = np.arange(start)<br>    <span class="hljs-keyword">else</span>:<br>        a = np.arange(start, stop, step)<br>        <span class="hljs-keyword">if</span> a[-<span class="hljs-number">1</span>] &gt; stop-step:<br>            a = np.delete(a, -<span class="hljs-number">1</span>)<br>    <span class="hljs-keyword">return</span> a<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">getProj</span>(<span class="hljs-params">img,theta</span>):<br>    numAngles = <span class="hljs-built_in">len</span>(theta)<br>    sinogram = np.zeros((img.size[<span class="hljs-number">0</span>], numAngles))<br>    <span class="hljs-comment"># Iteratively calculate the integral value of each projection</span><br>    <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(numAngles):<br>        theta = np.linspace(<span class="hljs-number">0.</span>, <span class="hljs-number">180.</span>, numAngles, endpoint=<span class="hljs-literal">False</span>)<br>        <span class="hljs-comment"># rotate the image</span><br>        rotImgObj = img.rotate(<span class="hljs-number">90</span>-theta[n], resample=Image.BICUBIC)<br>        <span class="hljs-comment"># calculate the integral value of porjection</span><br>        sinogram[:,n] = np.<span class="hljs-built_in">sum</span>(rotImgObj, axis=<span class="hljs-number">0</span>)<br>    <span class="hljs-keyword">return</span> sinogram<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">filterProj</span>(<span class="hljs-params">sinogram</span>):<br>    projLen, numAngles = sinogram.shape<br>    step = <span class="hljs-number">2</span> * np.pi / projLen<br>    w = fbp.arange2(-np.pi, np.pi, step)<br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(w)&lt;projLen:<br>        w = np.concatenate([w, [w[-<span class="hljs-number">1</span>] + step]])<br>    ramp_filter = np.<span class="hljs-built_in">abs</span>(w)<br>    ramp_filter = fftshift(ramp_filter)  <span class="hljs-comment"># shifts the zero-frequency component of the discrete Fourier transform (DFT) to the center of the array</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">filterProj2</span>(<span class="hljs-params">sinogram,a=<span class="hljs-number">0.1</span></span>):<br>    projLen, numAngles = sinogram.shape<br>    step = <span class="hljs-number">2</span> * np.pi / projLen<br>    w = arange2(-np.pi, np.pi, step)<br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(w) &lt; projLen:<br>        w = np.concatenate([w, [w[-<span class="hljs-number">1</span>] + step]])  <span class="hljs-comment"># depending on image size, it might be that len(w) =</span><br>        <span class="hljs-comment"># projLen - 1. Another element is added to w in this case</span><br>    rn1 = <span class="hljs-built_in">abs</span>(<span class="hljs-number">2</span> / a * np.sin(a * w / <span class="hljs-number">2</span>));  <span class="hljs-comment"># approximation of ramp filter abs(w) with a funciton abs(sin(w))</span><br>    rn2 = np.sin(a * w / <span class="hljs-number">2</span>) / (a * w / <span class="hljs-number">2</span>);  <span class="hljs-comment"># sinc window with 'a' modifying the cutoff freqs</span><br>    ramp_filter = rn1 * (rn2) ** <span class="hljs-number">2</span>;<br>    ramp_filter = fftshift(ramp_filter)<br><br>    filter_sinogram = np.zeros_like(sinogram)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(numAngles):<br>        projfft = fft(sinogram[:, i])  <span class="hljs-comment"># one dimentional Fourier transform</span><br>        filter_projfft = projfft * ramp_filter  <span class="hljs-comment"># *ramp_filter</span><br>        filter_proj = np.real(ifft(filter_projfft))  <span class="hljs-comment"># inverse Fourier transform</span><br>        filter_sinogram[:, i] = filter_proj<br>    plt.imshow(filter_sinogram, cmap=<span class="hljs-string">'gray'</span>)<br>    plt.title(<span class="hljs-string">"filter_sinogram"</span>)<br>    plt.show()<br>    <span class="hljs-keyword">return</span> filter_sinogram<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">backPorj</span>(<span class="hljs-params">filter_sinogram, theta</span>):<br>    <span class="hljs-comment"># define a empty reconstruction image</span><br>    N = filter_sinogram.shape[<span class="hljs-number">0</span>]<br>    reconImg = np.zeros((N, N))  <span class="hljs-comment"># the length of image is equal to the length of detector</span><br><br>    <span class="hljs-comment"># Create a grid coordinate system with the center point at (0,0) in which the origin of the image coordinate system,</span><br>    <span class="hljs-comment"># which is located at the upper left corner, is shifted to the center point.</span><br>    X = fbp.arange2(N) - N / <span class="hljs-number">2</span>  <span class="hljs-comment"># [-N/2,...0..+N/2]</span><br>    Y = X.copy()<br>    x, y = np.meshgrid(X, Y)  <span class="hljs-comment"># generate grid coordinate</span><br><br>    <span class="hljs-comment"># Convert degrees to radians</span><br>    theta = theta * np.pi / <span class="hljs-number">180</span><br><br>    numAngles = <span class="hljs-built_in">len</span>(theta)<br>    <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(numAngles):<br>        t = x * np.sin(theta[n]) + y * np.cos(theta[n])  <span class="hljs-comment"># x-y -&gt; t-s</span><br>        <span class="hljs-comment"># s = -x*np.sin(theta[n])+y*np.cos(theta[n])</span><br>        tCor = np.<span class="hljs-built_in">round</span>(<br>            t + N / <span class="hljs-number">2</span>)  <span class="hljs-comment"># Shift the coordinate axis origin to match the image origin. round() may result in floating-point numbers, needs to be rounded to an integer.</span><br>        tCor = tCor.astype(<span class="hljs-string">"int"</span>)<br>        tIndex, sIndex = np.where((tCor &gt;= <span class="hljs-number">0</span>) &amp; (tCor &lt;= N - <span class="hljs-number">1</span>))  <span class="hljs-comment"># tIndex: row index; sIndex: column Index</span><br>        sino_angle_n = filter_sinogram[:, n]<br>        reconImg[tIndex, sIndex] += sino_angle_n[tCor[tIndex, sIndex]]<br>        <span class="hljs-comment"># plt.imshow(reconImg, cmap='gray')</span><br>        <span class="hljs-comment"># plt.title('Image {}'.format(n))</span><br>        <span class="hljs-comment"># plt.show()</span><br>    reconImg = Image.fromarray((reconImg - np.<span class="hljs-built_in">min</span>(reconImg)) / np.ptp(reconImg) * <span class="hljs-number">255</span>)  <span class="hljs-comment"># normilization</span><br>    fig = plt.imshow(reconImg)<br>    plt.title(<span class="hljs-string">'reconImg'</span>)<br>    plt.show()<br>    <span class="hljs-keyword">return</span> reconImg<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">lineProfile</span>(<span class="hljs-params">height, img, reconImg</span>):<br>    line_profile = np.array(img)[height, :]<br>    recon_line_profile = np.array(reconImg)[height, :]<br><br>    plt.plot(line_profile, label=<span class="hljs-string">'Original Image'</span>)<br>    plt.plot(recon_line_profile, label=<span class="hljs-string">'Reconstructed Image'</span>)<br>    plt.xlabel(<span class="hljs-string">'Pixel Value'</span>)<br>    plt.ylabel(<span class="hljs-string">'Intensity'</span>)<br>    plt.title(<span class="hljs-string">'Line Profile at Pixel height= {}'</span>.<span class="hljs-built_in">format</span>(height))<br>    plt.legend()<br>    plt.show()<br>    <span class="hljs-keyword">return</span> line_profile, recon_line_profile<br></code></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>main.py</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> fbp<br><span class="hljs-keyword">from</span> PIL <span class="hljs-keyword">import</span> Image, ImageChops, ImageOps<br><span class="hljs-keyword">import</span> pydicom<br><span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt<br><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np<br><span class="hljs-keyword">from</span> scipy.fftpack <span class="hljs-keyword">import</span> fft, ifft, fftshift<br><span class="hljs-keyword">import</span> logging<br><span class="hljs-keyword">import</span> pickle<br><span class="hljs-keyword">import</span> json<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">'__main__'</span>:<br><br>    <span class="hljs-comment"># generate output logging</span><br>    logging.basicConfig(filename=<span class="hljs-string">'output.log'</span>, level=logging.DEBUG)<br>    logger = logging.getLogger(__name__)<br><br>    <span class="hljs-comment"># --------------------------------------------------Load data----------------------------------------------------------</span><br>    dcm = pydicom.dcmread(<span class="hljs-string">'C:\\Users\\Kathy\\Desktop\\DL\FBP\\1.2.826.0.1.3680043.5876\\1.dcm'</span>)<br>    img = Image.fromarray(dcm.pixel_array).convert(<span class="hljs-string">'L'</span>)<br>    <span class="hljs-comment"># img = np.asarray(img)</span><br>    <span class="hljs-comment"># img = (img - np.min(img)) / np.ptp(img) * 255</span><br>    <span class="hljs-comment"># img = img.astype(np.uint8)</span><br>    <span class="hljs-comment"># img = Image.fromarray(img)</span><br><br>    logger.debug(<span class="hljs-string">f"Original_img: <span class="hljs-subst">{img}</span>"</span>)<br>    plt.imshow(img, cmap=<span class="hljs-string">'gray'</span>)<br>    plt.title(<span class="hljs-string">"original_image"</span>)<br>    plt.show()<br><br>    <span class="hljs-comment"># -----------------------------------------------Forward Projection-----------------------------------------------------</span><br>    <span class="hljs-comment"># Define rotation angle and the number of rotation</span><br>    numAngles = <span class="hljs-number">720</span><br>    theta = np.linspace(<span class="hljs-number">0.</span>, <span class="hljs-number">180.</span>, numAngles, endpoint=<span class="hljs-literal">False</span>)<br>    sinogram = fbp.getProj(img, theta)<br>    logger.debug(<span class="hljs-string">f"sinogram: <span class="hljs-subst">{sinogram}</span>"</span>)<br><br>    <span class="hljs-comment"># -----------------------------------------------sinogram filteration---------------------------------------------------</span><br>    filter_sinogram=fbp.filterProj2(sinogram)<br>    logger.debug(<span class="hljs-string">f"filter_sinogram: <span class="hljs-subst">{filter_sinogram}</span>"</span>)<br><br>    <span class="hljs-comment"># --------------------------------------------- Back Projection/ Recon -------------------------------------------------</span><br>    reconImg = fbp.backPorj(filter_sinogram, theta)<br>    logger.debug(<span class="hljs-string">f"reconImg: <span class="hljs-subst">{reconImg}</span>"</span>)<br><br>    <span class="hljs-comment"># generate lineProfile</span><br>    fbp.lineProfile(<span class="hljs-number">200</span>,img,reconImg)<br><br><br>    <span class="hljs-comment"># Load logging</span><br>    <span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(<span class="hljs-string">'output.log'</span>, <span class="hljs-string">'r'</span>) <span class="hljs-keyword">as</span> f:<br>        content = f.readlines()<br>        <span class="hljs-built_in">print</span>(content)<br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Computed-Tomography/" class="category-chain-item">Computed Tomography</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/Computed-Tomography/Reconstruction/" class="category-chain-item">Reconstruction</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/FBP/" class="print-no-link">#FBP</a>
+      
+        <a href="/tags/Filter-Back-Projection/" class="print-no-link">#Filter Back Projection</a>
+      
+        <a href="/tags/CT/" class="print-no-link">#CT</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Filter Back Projection (FBP)</div>
+      <div>http://example.com/2023/04/07/Computed_Tomography/Recon/Filter Back Projection (FBP)/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>Author</div>
+          <div>Kathy Chen</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>Posted on</div>
+          <div>April 7, 2023</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>Licensed under</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - Attribution">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/04/07/Computed_Tomography/Recon/Iterative%20Reconstruction%20(IR)/" title="Iterative reconstruction (IR)">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Iterative reconstruction (IR)</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/03/01/Software_Setting/Kaggle/How%20to%20Download%20Kaggle%20dataset%20in%20Linux%20server/" title="How to Download Kaggle dataset in Linux server">
+                        <span class="hidden-mobile">How to Download Kaggle dataset in Linux server</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>Table of Contents</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">Keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="busuanzi_container_site_pv" style="display: none">
+        Views: 
+        <span id="busuanzi_value_site_pv"></span>
+        
+      </span>
+    
+    
+      <span id="busuanzi_container_site_uv" style="display: none">
+        Visitors: 
+        <span id="busuanzi_value_site_uv"></span>
+        
+      </span>
+    
+    
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">Blog works best with JavaScript enabled</div>
+  </noscript>
+</body>
+</html>
