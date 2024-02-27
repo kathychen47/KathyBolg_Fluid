@@ -25,8 +25,7 @@ jobs:
             ${{ runner.OS }}-npm-cache
       - name: Install Dependencies
         run: npm install
-      - name: install pandoc
-        run: sudo dpkg -i pandoc.deb
+
       - name: Build
         run: npm run build
       - name: Deploy
